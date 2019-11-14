@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ffeCompet</string>
+    <string name="action_settings">Settings</string>
+    <string name="add_concours_activity_name">Ajout Concours</string>
+    <string name="add_epreuve_activity_name">Ajout Epreuve</string>
+
+</resources>

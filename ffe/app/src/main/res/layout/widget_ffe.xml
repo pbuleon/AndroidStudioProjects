@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_ffe"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <ImageView
+            android:id="@+id/network"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/noir"
+            android:src="@drawable/logoffeko" />
+
+        <TextView
+            android:id="@+id/textTitreConcours"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="@color/noir"
+            android:gravity="center"
+            android:text="FFE"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/blanc" />
+
+    </LinearLayout>
+
+		<LinearLayout
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:background="@color/noir"
+		    android:orientation="vertical"
+		    android:paddingBottom="2dp"
+		    android:paddingLeft="2dp"
+		    android:paddingRight="2dp"
+		    android:paddingTop="2dp" >
+
+		    <LinearLayout
+		        android:id="@+id/evt_1"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:background="@color/noir"
+		        android:paddingBottom="1dp" >
+
+        		<TextView
+        		    android:id="@+id/evtText_1"
+        		    android:layout_width="wrap_content"
+        		    android:layout_height="wrap_content"
+        		    android:layout_weight="50"
+        		    android:background="@color/blanc"
+        		    android:text=""
+        		    android:textAppearance="?android:attr/textAppearanceLarge"
+        		    android:textColor="@color/noir"
+        		    android:ellipsize="end"
+        		    android:singleLine="true" />
+
+
+        	</LinearLayout>
+
+		    <LinearLayout
+		        android:id="@+id/evt_2"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:background="@color/noir"
+		        android:paddingBottom="1dp" >
+
+        		<TextView
+        		    android:id="@+id/evtText_2"
+        		    android:layout_width="wrap_content"
+        		    android:layout_height="wrap_content"
+        		    android:layout_weight="50"
+        		    android:background="@color/blanc"
+        		    android:text=""
+        		    android:textAppearance="?android:attr/textAppearanceLarge"
+        		    android:textColor="@color/noir"
+        		    android:ellipsize="end"
+        		    android:singleLine="true" />
+
+        	</LinearLayout>
+
+		    <LinearLayout
+		        android:id="@+id/evt_3"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:background="@color/noir"
+		        android:paddingBottom="1dp" >
+
+        		<TextView
+        		    android:id="@+id/evtText_3"
+        		    android:layout_width="wrap_content"
+        		    android:layout_height="wrap_content"
+        		    android:layout_weight="50"
+        		    android:background="@color/blanc"
+        		    android:text=""
+        		    android:textAppearance="?android:attr/textAppearanceLarge"
+        		    android:textColor="@color/noir"
+        		    android:ellipsize="end"
+        		    android:singleLine="true" />
+
+
+        	</LinearLayout>
+
+		    <LinearLayout
+        		android:id="@+id/evt_4"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:background="@color/noir" >
+
+        		<TextView
+        		    android:id="@+id/evtText_4"
+        		    android:layout_width="wrap_content"
+        		    android:layout_height="wrap_content"
+        		    android:layout_weight="50"
+        		    android:background="@color/blanc"
+        		    android:text=""
+        		    android:textAppearance="?android:attr/textAppearanceLarge"
+        		    android:textColor="@color/noir"
+        		    android:ellipsize="end"
+        		    android:singleLine="true" />
+
+
+        	</LinearLayout>
+        </LinearLayout>
+
+
+</LinearLayout>
