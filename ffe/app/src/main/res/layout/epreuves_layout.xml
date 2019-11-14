@@ -16,32 +16,37 @@
             android:id="@+id/concoursNumView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="50"
-            android:text="201535082" />
- 
+            android:layout_weight="30"
+            android:text="201535082"
+            android:textColor="@color/noir" />
+
         <TextView
             android:id="@+id/epreuveNumView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="25"
-            android:text="22" />
-        
+            android:layout_weight="10"
+            android:text="22"
+            android:textColor="@color/noir" />
+
         <TextView
             android:id="@+id/dateView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="50"
             android:gravity="center_horizontal"
-            android:text="--/--/--" />
-        
+            android:text="--/--/--"
+            android:textColor="@color/noir" />
+
         <TextView
             android:id="@+id/etatView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="50"
-            android:gravity="right"
+            android:layout_weight="30"
+            android:gravity="center"
             android:paddingRight="5dp"
-            android:text="etatView" />
+            android:text="etatView"
+            android:textAlignment="center"
+            android:textColor="@color/noir" />
 
     </LinearLayout>
 
@@ -55,7 +60,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="commentaire" />
+            android:text="commentaire"
+            android:textColor="@color/noir" />
 
     </LinearLayout>
     

@@ -95,7 +95,7 @@ public class AddEpreuveActivity extends Activity
         listeConc.newEpreuves(stringNumConc, stringEpreuveNum, ConcoursReader.UNKNOWN_STATE, "Complet", ConcoursReader.UNKNOWN_DATE, stringconcComment, ConcoursReader.UNKNOWN_STATE, 0, 0,smsmgr.getContactList());
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle("Ajout ...");
-        alertDialog.setMessage("Epreuve ajout�");
+        alertDialog.setMessage("Epreuve ajouté");
         alertDialog.setCancelable(false);
         alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL,"Ok",new DialogInterface.OnClickListener() 
         {

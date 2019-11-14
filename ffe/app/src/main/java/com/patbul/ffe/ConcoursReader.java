@@ -55,6 +55,7 @@ public class ConcoursReader {
     public final static String CLOS_STATE = "clos";
 
     public static String DISPO = "Dispo";
+    public static String COMPLET = "Complet";
 
     public static final int RIEN = 0;
     public static final int RESEAU_KO = 1;
@@ -239,6 +240,9 @@ public class ConcoursReader {
                             nbPlacePriseNew.set(Integer.parseInt(tdEngage[0].trim()));
                             if (nbPlacePriseNew.get() < nbPlaceMaxNew.get()){
                                 newEtatEpreuve.append(DISPO);
+                            }
+                            else{
+                                newEtatEpreuve.append(COMPLET);
                             }
                         }
                         return;
