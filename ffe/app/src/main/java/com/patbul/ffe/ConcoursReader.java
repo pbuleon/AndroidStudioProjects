@@ -213,11 +213,11 @@ public class ConcoursReader {
             return;
         }
         Elements tableBody = table.getElementsByTag("tbody");
-        if ((table == null) || (tableBody.size()==0)){
+        if ((tableBody == null) || (tableBody.size()==0)){
             Log.d("ConcoursReader", "parseEpreuve : tbody not found");
             return;
         }
-        Elements trs = table.getElementsByTag("tr");
+        Elements trs = tableBody.get(0).getElementsByTag("tr");
         if ((trs == null) || (trs.size()==0)){
             Log.d("ConcoursReader", "parseEpreuve : trs not found");
             return;
@@ -286,7 +286,7 @@ public class ConcoursReader {
         try {
 
             Document doc = Jsoup.connect(myurl).get();
-            Elements etatElem = doc.getElementsByClass("right hidden-xs");
+            Elements etatElem = doc.getElementsByClass("d-block d-sm-none");
             if (etatElem.size() == 0) {
                 etat.append(UNKNOWN_STATE);
                 organisateur.append(UNKNOWN_STATE);

@@ -78,7 +78,7 @@ public class AddConcoursActivity extends Activity
             listeConc.newConcours(stringNumConc, ConcoursReader.UNKNOWN_STATE, ConcoursReader.UNKNOWN_STATE, ConcoursReader.UNKNOWN_DATE,stringconcComment,smsmgr.getContactList());
         	AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         	alertDialog.setTitle("Ajout ...");
-        	alertDialog.setMessage("Concours ajout�");
+        	alertDialog.setMessage("Concours ajouté");
         	alertDialog.setCancelable(false);
         	alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL,"Ok",new DialogInterface.OnClickListener() 
         	{
