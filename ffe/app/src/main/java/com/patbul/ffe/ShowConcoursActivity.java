@@ -1,5 +1,6 @@
 package com.patbul.ffe;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.appwidget.AppWidgetManager;
@@ -16,6 +17,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+
 
 public class ShowConcoursActivity extends Activity
 {
@@ -83,16 +86,14 @@ public class ShowConcoursActivity extends Activity
         return true;
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) 
     {
-        switch (item.getItemId()) 
-        {
-        case R.id.action_settings:
+        if (item.getItemId() == R.id.action_settings) {
             return true;
-        default:
-            return super.onOptionsItemSelected(item);
         }
+        return super.onOptionsItemSelected(item);
     }
 
     public void supClickHandler(View view) 

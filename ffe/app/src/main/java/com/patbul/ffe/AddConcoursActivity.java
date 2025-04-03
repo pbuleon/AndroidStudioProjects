@@ -1,5 +1,6 @@
 package com.patbul.ffe;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -38,16 +39,14 @@ public class AddConcoursActivity extends Activity
         return true;
     }
    
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) 
     {
-        switch (item.getItemId()) 
-        {
-        case R.id.action_settings:
+        if (item.getItemId() == R.id.action_settings) {
             return true;
-        default:
-            return super.onOptionsItemSelected(item);
         }
+        return super.onOptionsItemSelected(item);
     }
     
     public void myClickHandler(View view) 

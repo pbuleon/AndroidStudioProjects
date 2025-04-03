@@ -12,6 +12,7 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -309,20 +310,16 @@ public class MainActivity extends Activity{
         return true;
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        switch (item.getItemId())
-        {
-            case R.id.action_settings:
-                return setup();
-            case R.id.addConcours:
-                return addConcours();
-            case R.id.addEpreuve:
-                return addEpreuve();
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        int id = item.getItemId();
+        if (id == R.id.action_settings) return setup();
+        if (id == R.id.addConcours) return addConcours();
+        if (id == R.id.addEpreuve) return addEpreuve();
+        return super.onOptionsItemSelected(item);
+
     }
 
     private boolean setup()
