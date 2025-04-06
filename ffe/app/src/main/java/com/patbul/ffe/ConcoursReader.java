@@ -100,22 +100,6 @@ public class ConcoursReader {
 
                             vibre(context);
 
-                            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
-                            mBuilder.setSmallIcon(R.drawable.ic_launcher);
-                            mBuilder.setContentTitle("Concours Ouvert");
-                            mBuilder.setContentText(num + " : " + commentaire);
-                            mBuilder.setAutoCancel(true);
-                            mBuilder.setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
-                            mBuilder.setLights(Color.WHITE, 3000, 3000);
-                            Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-                            mBuilder.setSound(alarmSound);
-                            mBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
-                            Intent resultIntent = new Intent(context, MainActivity.class);
-                            PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                            mBuilder.setContentIntent(resultPendingIntent);
-                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                            Notification note = mBuilder.build();
-                            mNotifyMgr.notify(Integer.parseInt(num), note);
 
                             //SMS
                             sendSMS("Concours Ouvert " + num + ": " + commentaire, context, smsList);
@@ -173,24 +157,7 @@ public class ConcoursReader {
                                 vibre(context);
 
 
-                                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
-                                mBuilder.setSmallIcon(R.drawable.ic_launcher);
-                                mBuilder.setContentTitle("Place Dispos");
-                                mBuilder.setContentText(numConc + " / " + numEpr + " : " + comment);
-                                mBuilder.setAutoCancel(true);
-                                mBuilder.setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
-                                mBuilder.setLights(Color.WHITE, 3000, 3000);
-                                Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-                                mBuilder.setSound(alarmSound);
-                                mBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
-                                Intent resultIntent = new Intent(context, MainActivity.class);
-                                PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                                mBuilder.setContentIntent(resultPendingIntent);
-                                NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                                Notification note = mBuilder.build();
-                                mNotifyMgr.notify(Integer.parseInt(numConc) * 100 + Integer.parseInt(numEpr), note);
-
-                                //SMS
+                                 //SMS
                                 sendSMS("Place Dispos " + numConc + " / " + numEpr + " : " + comment, context, smsList);
 
                             } else {
