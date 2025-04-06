@@ -1,48 +1,28 @@
 package com.patbul.ffe;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.URL;
-
-import javax.net.ssl.HttpsURLConnection;
-
+import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Typeface;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.EditText;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import android.content.pm.PackageManager;
 
 
-public class MainActivity extends Activity{
+public class MainActivity extends AppCompatActivity{
 
     public static final String CONCOURS_TO_SHOW = "com.patbull.ffecompet.concourstoshow";
     public static final String EPREUVE_TO_SHOW = "com.patbull.ffecompet.epreuvetoshow";
@@ -51,6 +31,7 @@ public class MainActivity extends Activity{
 
     FfeServiceThread thread=null;;
 
+    private static final int REQUEST_READ_CONTACTS_PERMISSION = 0;
 
 
 
@@ -65,6 +46,8 @@ public class MainActivity extends Activity{
 
         SharedPreferences sharedPref = this.getSharedPreferences("com.patbul.ffecompet.preferences", 0);
         FfeWidget.PERIODE=sharedPref.getInt("PERIODE", FfeWidget.PERIODE);
+
+        requestContactsPermission();
 
     }
 
@@ -372,7 +355,19 @@ public class MainActivity extends Activity{
 
     }
 
-
+    private boolean hasContactsPermission()
+    {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) ==
+                PackageManager.PERMISSION_GRANTED;
+    }
+    private void requestContactsPermission()
+    {
+        if (!hasContactsPermission())
+        {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_READ_CONTACTS_PERMISSION);
+        }
+    }
 
 
 

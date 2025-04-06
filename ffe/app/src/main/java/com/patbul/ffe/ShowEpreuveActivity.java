@@ -32,7 +32,7 @@ public class ShowEpreuveActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_epreuve);
-        
+
         final Intent intent = getIntent();
         this.numConcours = intent.getStringExtra(MainActivity.CONCOURS_TO_SHOW);
         TextView tv1 = (TextView)findViewById( R.id.concoursNumView );
@@ -167,29 +167,26 @@ public class ShowEpreuveActivity extends Activity
    	 	ListConcoursDB listeConc = new ListConcoursDB(this);
    	 	listeConc.updateSmsListeEpreuve(this.numConcours,this.eprNum,smsmgr.getContactList());
     }
-    
+
     public void addSmsHandler(View view) 
     {
     	Log.d(this.getClass().getName(), "addSmsHandler");
+
         Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
         startActivityForResult(intent, PICK_CONTACT);
     }
- 
+
     @Override 
     public void onActivityResult(int reqCode, int resultCode, Intent data)
     { 
         super.onActivityResult(reqCode, resultCode, data);
 
-        switch(reqCode)
-        {
-           case (PICK_CONTACT):
-             if (resultCode == Activity.RESULT_OK)
-             {
-            	 smsmgr.addSms(data);
-            	 ListConcoursDB listeConc = new ListConcoursDB(this);
-            	 listeConc.updateSmsListeEpreuve(this.numConcours,this.eprNum,smsmgr.getContactList());
-             }
-           	break;
+        if (reqCode == PICK_CONTACT) {
+            if (resultCode == Activity.RESULT_OK) {
+                smsmgr.addSms(data);
+                ListConcoursDB listeConc = new ListConcoursDB(this);
+                listeConc.updateSmsListeEpreuve(this.numConcours, this.eprNum, smsmgr.getContactList());
+            }
         }
 
     }

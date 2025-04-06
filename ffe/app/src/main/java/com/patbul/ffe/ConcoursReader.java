@@ -1,5 +1,7 @@
 package com.patbul.ffe;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,9 +20,12 @@ import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.VibratorManager;
+import android.os.VibrationEffect;
 import android.provider.ContactsContract;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.os.Vibrator;
 
 import androidx.core.app.NotificationCompat;
 
@@ -92,6 +97,9 @@ public class ConcoursReader {
 
                             // notif
                             Log.d("ConcoursReader", "Notif : ");
+
+                            vibre(context);
+
                             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
                             mBuilder.setSmallIcon(R.drawable.ic_launcher);
                             mBuilder.setContentTitle("Concours Ouvert");
@@ -161,6 +169,10 @@ public class ConcoursReader {
                                 listeConc.updateEpreuve(numConc, numEpr, newEtatEpreuve.toString(), organisateur.toString(), date.toString(), 1, newIntule.toString(), nbPlaceMaxNew.get(), nbPlacePriseNew.get());
                                 // notif
                                 Log.d("ConcoursReader", "Notif : ");
+
+                                vibre(context);
+
+
                                 NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
                                 mBuilder.setSmallIcon(R.drawable.ic_launcher);
                                 mBuilder.setContentTitle("Place Dispos");
@@ -204,6 +216,23 @@ public class ConcoursReader {
             return RESEAU_KO;
         }
 
+    }
+
+    private static void vibre(Context context) {
+        Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        if (vibrator != null && vibrator.hasVibrator()) {
+            // Android 8.0+ (API 26) nécessite l'utilisation de VibrationEffect
+            long[] pattern = {
+                    0, 1000,  // Démarrage immédiat, vibre 1 sec
+                    1000, 1000,
+                    1000, 1000,
+                    1000, 1000,
+                    1000, 1000  // Total : 10 sec
+            };
+            VibrationEffect effect = VibrationEffect.createWaveform(pattern, -1);
+            vibrator.vibrate(effect);
+
+        }
     }
 
     private static void parseEpreuve(Document doc, int numEpr, StringBuilder newIntule, AtomicInteger nbPlaceMaxNew, AtomicInteger nbPlacePriseNew, StringBuilder newEtatEpreuve) {
