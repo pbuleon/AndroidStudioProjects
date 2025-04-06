@@ -144,7 +144,7 @@ public class FfeWidget extends AppWidgetProvider
     				break;
     			}
     		
-    			String text = "Places dispos : " + comment;
+    			String text = "Place dispo : " + comment;
     			views.setTextViewText(etatId, text);
   
     			Intent resultIntent = new Intent(context, ShowEpreuveActivity.class);

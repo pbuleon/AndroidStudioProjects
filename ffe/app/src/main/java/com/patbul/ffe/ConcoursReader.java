@@ -158,7 +158,7 @@ public class ConcoursReader {
 
 
                                  //SMS
-                                sendSMS("Place Dispos " + numConc + " / " + numEpr + " : " + comment, context, smsList);
+                                sendSMS("Place dispo " + numConc + " / " + numEpr + " : " + comment, context, smsList);
 
                             } else {
                                 listeConc.updateEpreuve(numConc, numEpr, newEtatEpreuve.toString(), organisateur.toString(), date.toString(), 0, newIntule.toString(), nbPlaceMaxNew.get(), nbPlacePriseNew.get());
