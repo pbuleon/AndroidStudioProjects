@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity{
     FfeServiceThread thread=null;;
 
     private static final int REQUEST_READ_CONTACTS_PERMISSION = 0;
+    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 1;
 
 
 
@@ -48,6 +49,8 @@ public class MainActivity extends AppCompatActivity{
         FfeWidget.PERIODE=sharedPref.getInt("PERIODE", FfeWidget.PERIODE);
 
         requestContactsPermission();
+
+        requestSmsPermission();
 
     }
 
@@ -366,6 +369,15 @@ public class MainActivity extends AppCompatActivity{
         {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_READ_CONTACTS_PERMISSION);
+        }
+    }
+
+    private void requestSmsPermission()
+    {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.SEND_SMS}, MY_PERMISSIONS_REQUEST_SEND_SMS);
         }
     }
 
