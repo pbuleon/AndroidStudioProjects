@@ -32,7 +32,8 @@
             android:background="@color/blanc"
             android:ems="10"
             android:gravity="center_vertical|center_horizontal"
-            android:inputType="number" />
+            android:inputType="number"
+            android:textColor="@color/noir" />
 
         <TextView
             android:id="@+id/minutesTitre"
