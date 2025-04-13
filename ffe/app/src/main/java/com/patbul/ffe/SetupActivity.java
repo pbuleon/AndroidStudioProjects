@@ -48,7 +48,11 @@ public class SetupActivity extends Activity
     public boolean onCreateOptionsMenu(Menu menu) {
         return true;
     }
-   
+
+    public void testCompteFFE(View view)
+    {
+
+    }
     
     public void myClickHandler(View view) 
     {

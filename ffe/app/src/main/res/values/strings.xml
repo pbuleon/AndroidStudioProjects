@@ -6,4 +6,12 @@
     <string name="add_concours_activity_name">Ajout Concours</string>
     <string name="add_epreuve_activity_name">Ajout Epreuve</string>
 
+    <string name="setup_save">Sauver</string>
+    <string name="setup_sms_list">Liste des SMS</string>
+    <string name="setup_periode_unit">Minutes</string>
+    <string name="setup_periode">Période</string>
+    <string name="setup_ffe_compte_titre">Compte FFE</string>
+    <string name="setup_ffe_compte">Compte</string>
+    <string name="setup_ffe_password">Mot de passe</string>
+    <string name="setup_ffe_test">Test</string>
 </resources>
