@@ -54,7 +54,7 @@ public class FfeWidget extends AppWidgetProvider
     	RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_ffe);
     	
 		Intent widgetIntent = new Intent(context, MainActivity.class);
-		PendingIntent widgetPendingIntent = PendingIntent.getActivity(context, 0, widgetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent widgetPendingIntent = PendingIntent.getActivity(context, 0, widgetIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
         //  Attach an on-click listener to the event
         views.setOnClickPendingIntent(R.id.widget_ffe, widgetPendingIntent);
 
@@ -97,7 +97,9 @@ public class FfeWidget extends AppWidgetProvider
   
     			Intent resultIntent = new Intent(context, ShowConcoursActivity.class);
     			resultIntent.putExtra(MainActivity.CONCOURS_TO_SHOW, num);
-    			PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+    			PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
     	        //  Attach an on-click listener to the event
     	        views.setOnClickPendingIntent(etatId, resultPendingIntent);
 
@@ -150,7 +152,7 @@ public class FfeWidget extends AppWidgetProvider
     			Intent resultIntent = new Intent(context, ShowEpreuveActivity.class);
     			resultIntent.putExtra(MainActivity.CONCOURS_TO_SHOW, numConc);
     			resultIntent.putExtra(MainActivity.EPREUVE_TO_SHOW, numEpr);
-    			PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+    			PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
     	        //  Attach an on-click listener to the event
     	        views.setOnClickPendingIntent(etatId, resultPendingIntent);
 

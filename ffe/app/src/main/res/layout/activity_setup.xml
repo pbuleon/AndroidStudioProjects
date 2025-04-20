@@ -133,7 +133,7 @@
             android:layout_width="50dp"
             android:layout_weight="1"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="TextView" />
+            android:text="@string/setup_ffe_password" />
 
         <EditText
             android:id="@+id/passwordFFE"
@@ -147,11 +147,14 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/button4"
+        android:id="@+id/testFFE"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="@string/setup_ffe_test" />
+        android:layout_marginTop="10dp"
+        android:text="@string/setup_ffe_test"
+        android:enabled="false"
+        android:onClick="testCompteFFE"/>
 
     <RelativeLayout
         android:layout_width="match_parent"

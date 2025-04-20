@@ -40,7 +40,8 @@ public class FfeBroadcastReceiver extends BroadcastReceiver
 			switch (res)
 			{
 			    case ConcoursReader.RIEN:
-			        for (int i = 0; i < N; i++) 
+                case ConcoursReader.EVOLUTION_CONCOURS:
+                    for (int i = 0; i < N; i++)
 			        {
 			            int appWidgetId = ids[i];
 			            FfeWidget.updateAppWidget(cont, manager, appWidgetId);
@@ -55,17 +56,9 @@ public class FfeBroadcastReceiver extends BroadcastReceiver
 			            FfeWidget.setNetworkKO(cont, manager, appWidgetId);
 			        }
 					break;
-			    case ConcoursReader.EVOLUTION_CONCOURS:
-			        for (int i = 0; i < N; i++) 
-			        {
-			            int appWidgetId = ids[i];
-			            FfeWidget.updateAppWidget(cont, manager, appWidgetId);
-			            FfeWidget.setNetworkOK(cont, manager, appWidgetId);
-			        }
-					break;
 
-				
-			}
+
+            }
 			Log.d (this.getClass().getName(),"run fini:");
 		}
 			
