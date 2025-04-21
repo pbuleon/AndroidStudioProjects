@@ -1,35 +1,9 @@
 package com.patbul.ffe;
 
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.net.ssl.HttpsURLConnection;
-
-
-import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.util.Log;
 
-public class FfeServiceThread extends Thread
+public class FfeImmediatUpdate extends Thread
 {
 	private static String URL_PREF="https://ffecompet.ffe.com/concours/";
 	public static String FERME_STATE="Ferme";
@@ -43,7 +17,7 @@ public class FfeServiceThread extends Thread
 
 	private MainActivity activite=null;
 	
-	FfeServiceThread(MainActivity mainActivity)
+	FfeImmediatUpdate(MainActivity mainActivity)
 	{
 		activite=mainActivity;
 	}

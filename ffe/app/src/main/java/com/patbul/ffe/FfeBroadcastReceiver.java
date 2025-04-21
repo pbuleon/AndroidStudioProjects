@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.PowerManager;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -68,6 +69,19 @@ public class FfeBroadcastReceiver extends BroadcastReceiver
 	 public void onReceive(Context context, Intent intent) 
 	 {
 		 Log.d (this.getClass().getName(),"onReceive :");
+
+		 if (intent.getAction() != null &&
+				 intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
+
+			 // Pour Android 8.0+, vous devez démarrer le service en premier plan
+			 Intent serviceIntent = new Intent(context, FFEServiceForeGround.class);
+
+             context.startForegroundService(serviceIntent);
+			 return;
+         }
+
+
+
 		 nbMinutes++;
 		 if (nbMinutes < FfeWidget.PERIODE) return;
 		 

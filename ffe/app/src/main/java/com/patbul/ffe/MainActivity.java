@@ -2,11 +2,15 @@ package com.patbul.ffe;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
 import android.util.Log;
@@ -26,10 +30,11 @@ public class MainActivity extends AppCompatActivity{
 
     public static final String CONCOURS_TO_SHOW = "com.patbull.ffecompet.concourstoshow";
     public static final String EPREUVE_TO_SHOW = "com.patbull.ffecompet.epreuvetoshow";
+    public static final String CHANNEL_ID = "FFEService";
     private LinearLayout concousListView;
     private LinearLayout epreuvesListView;
 
-    FfeServiceThread thread=null;;
+    FfeImmediatUpdate thread=null;;
 
     private static final int REQUEST_READ_CONTACTS_PERMISSION = 0;
     private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 1;
@@ -37,21 +42,74 @@ public class MainActivity extends AppCompatActivity{
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         setContentView(R.layout.activity_main);
 
         this.concousListView = (LinearLayout) findViewById(R.id.concoursListView);
         this.epreuvesListView = (LinearLayout) findViewById(R.id.epreuvesListView);
 
         SharedPreferences sharedPref = this.getSharedPreferences("com.patbul.ffecompet.preferences", 0);
-        FfeWidget.PERIODE=sharedPref.getInt("PERIODE", FfeWidget.PERIODE);
+        FfeWidget.PERIODE = sharedPref.getInt("PERIODE", FfeWidget.PERIODE);
 
         requestContactsPermission();
 
         requestSmsPermission();
 
+        // Créer le canal de notification
+        NotificationChannel serviceChannel = new NotificationChannel(
+                CHANNEL_ID,
+                "Canal Service Premier Plan",
+                NotificationManager.IMPORTANCE_DEFAULT
+        );
+
+        // Configurer le canal
+        serviceChannel.setDescription("Canal utilisé pour le service en premier plan");
+        serviceChannel.setShowBadge(false);
+        serviceChannel.enableVibration(false);
+
+        // Enregistrer le canal
+        NotificationManager manager = getSystemService(NotificationManager.class);
+        manager.createNotificationChannel(serviceChannel);
+
+        demarrerService();
+    }
+
+    private void demarrerService() {
+        // Créer le canal de notification
+        NotificationChannel serviceChannel = new NotificationChannel(
+                CHANNEL_ID,
+                "Canal Service Premier Plan",
+                NotificationManager.IMPORTANCE_DEFAULT
+        );
+
+        // Configurer le canal
+        serviceChannel.setDescription("Canal utilisé pour le service en premier plan");
+        serviceChannel.setShowBadge(false);
+        serviceChannel.enableVibration(false);
+
+        // Enregistrer le canal
+        NotificationManager manager = getSystemService(NotificationManager.class);
+        manager.createNotificationChannel(serviceChannel);
+
+        // Vérifier les permissions nécessaires pour Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1);
+            }
+        }
+
+        // Créer l'intent et démarrer le service
+        Intent serviceIntent = new Intent(this, FFEServiceForeGround.class);
+
+        // Pour Android 8.0+
+        startForegroundService(serviceIntent);
     }
 
     @Override
@@ -67,7 +125,7 @@ public class MainActivity extends AppCompatActivity{
 //      mBound = true;
 //      Log.d(this.getClass().getName(), "bindService fai t");
 
-        thread = new FfeServiceThread(this);
+        thread = new FfeImmediatUpdate(this);
         thread.start();
 
     }

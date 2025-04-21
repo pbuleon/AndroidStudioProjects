@@ -1,5 +1,7 @@
 package com.patbul.ffe;
 
+import static android.app.PendingIntent.FLAG_IMMUTABLE;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -236,7 +238,7 @@ public class FfeWidget extends AppWidgetProvider
 		 
 		 AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 		 Intent timerIntent = new Intent(context, FfeBroadcastReceiver.class);
-		 PendingIntent pi = PendingIntent.getBroadcast(context, 0, timerIntent, 0);
+		 PendingIntent pi = PendingIntent.getBroadcast(context, 0, timerIntent, FLAG_IMMUTABLE);
 		 //After after 3 seconds
 		 am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+ 1000 * 3, 60000 , pi); 
 	 }
