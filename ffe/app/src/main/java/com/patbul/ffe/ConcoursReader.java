@@ -1,38 +1,41 @@
 package com.patbul.ffe;
 
-import static androidx.core.content.ContextCompat.getSystemService;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.media.RingtoneManager;
+
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.VibratorManager;
+
 import android.os.VibrationEffect;
 import android.provider.ContactsContract;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.os.Vibrator;
 
-import androidx.core.app.NotificationCompat;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
 
 
 class EpreuveData {
@@ -49,6 +52,9 @@ class EpreuveData {
 
 public class ConcoursReader {
     private static String URL_PREF = "https://ffecompet.ffe.com/concours/";
+    private static String URL_BASE = "https://ffecompet.ffe.com";
+    private static String  FFE_USERNAME = "ws-mobile";
+    private static String FFE_PASSWORD = "ws-mobile";
     public static String UNKNOWN_DATE = "--/--/--";
     public final static String UNKNOWN_STATE = "inconnu";
     public final static String OUVERT_STATE = "ouvert";
@@ -67,7 +73,57 @@ public class ConcoursReader {
     public static final int EVOLUTION_CONCOURS = 3;
 
 
+    static private String getToken(){
+        Log.d("ConcoursReader", "getToken .....");
+
+        try {
+            URL url = new URL(URL_BASE + "/secure-ws/token");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+            String params = "username=" + URLEncoder.encode(FFE_USERNAME, "UTF-8") +
+                    "&password=" + URLEncoder.encode(FFE_PASSWORD, "UTF-8") +
+                    "&service=" + URLEncoder.encode(URL_BASE + "/", "UTF-8");
+
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(params.getBytes("UTF-8"));
+            }
+
+            int responseCode = conn.getResponseCode();
+
+            BufferedReader reader;
+            if (responseCode >= 200 && responseCode < 300) {
+                reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                String token = response.toString();
+                if (token.isEmpty()) {
+                    Log.d("ConcoursReader", "Empty token");
+                }
+                else {
+                    Log.d("ConcoursReader", "Token reçu : " + token);
+                }
+                return token;
+            } else {
+                Log.d("ConcoursReader", "response code : " + responseCode);
+                return "";
+            }
+
+        } catch (Exception e) {
+            Log.d("ConcoursReader", "Erreur lors de l'authentification");
+            System.out.println("Erreur lors de l'authentification");
+            return "";
+        }
+    }
+
     static public int UpdateConcours(Context context) {
+
         boolean updateView = false;
         ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -88,7 +144,7 @@ public class ConcoursReader {
                     StringBuilder newEtat = new StringBuilder();
                     StringBuilder organisateur = new StringBuilder();
                     StringBuilder date = new StringBuilder();
-                    DownloadUrl(URL_PREF + num, newEtat, organisateur, date);
+                    DownloadUrl(num, newEtat, organisateur, date);
                     Log.d("ConcoursReader", "concours : " + num + " newetat : " + newEtat);
 
                     if ((newEtat.toString().compareTo(UNKNOWN_STATE) != 0) && (newEtat.toString().compareTo(oldEtat) != 0)) {
@@ -117,7 +173,7 @@ public class ConcoursReader {
                 Log.d("ConcoursReader", "nb epreuve : " + c.getCount());
                 c.moveToFirst();
                 while (!c.isAfterLast()) {
-                    String numConc = c.getString(ListConcoursDB.COLUMN_NAME_EPREUVES_ID_COLUM_RANK);
+                    String concoursId = c.getString(ListConcoursDB.COLUMN_NAME_EPREUVES_ID_COLUM_RANK);
                     String numEpr = c.getString(ListConcoursDB.COLUMN_NAME_EPREUVES_NUM_COLUM_RANK);
                     String etat = c.getString(ListConcoursDB.COLUMN_NAME_EPREUVES_ETAT_COLUM_RANK);
                     String intitule = c.getString(ListConcoursDB.COLUMN_NAME_EPREUVES_INTITULE_COLUM_RANK);
@@ -127,30 +183,29 @@ public class ConcoursReader {
                     int evt = c.getInt(ListConcoursDB.COLUMN_NAME_EPREUVES_EVENT_COLUM_RANK);
                     String smsList = c.getString(ListConcoursDB.COLUMN_NAME_EPREUVES_SMS_LIST_RANK);
 
-                    Log.d("ConcoursReader", "epreuve : " + numConc + " " + numEpr + " etat : " + etat);
+                    Log.d("ConcoursReader", "epreuve : " + concoursId + " " + numEpr + " etat : " + etat);
 
                     if (etat.compareTo(DISPO) != 0) {
                         StringBuilder newEtat = new StringBuilder();
                         StringBuilder organisateur = new StringBuilder();
                         StringBuilder date = new StringBuilder();
 
-                        Document doc = DownloadUrl(URL_PREF + numConc, newEtat, organisateur, date);
+                        JsonNode root = DownloadUrl(concoursId, newEtat, organisateur, date);
 
 
-                        Log.d("ConcoursReader", "epreuve : " + numConc + " " + numEpr + " newetat : " + newEtat);
-
+                        Log.d("ConcoursReader", "epreuve : " + concoursId + " " + numEpr + " newetat : " + newEtat);
                         if (newEtat.toString().compareTo(OUVERT_STATE) == 0) {
                             StringBuilder newIntule = new StringBuilder();
-                            AtomicInteger nbPlaceMaxNew = new AtomicInteger(0);
+                            AtomicInteger nbPlaceMaxNew = new AtomicInteger(nbPlaceMax);
                             AtomicInteger nbPlacePriseNew = new AtomicInteger(0);
                             StringBuilder newEtatEpreuve = new StringBuilder();
-                            parseEpreuve(doc , Integer.parseInt(numEpr), newIntule, nbPlaceMaxNew, nbPlacePriseNew, newEtatEpreuve);
-                            listeConc.updateEpreuve(numConc, numEpr, newEtatEpreuve.toString(), organisateur.toString(), date.toString(), 0, newIntule.toString(), nbPlaceMaxNew.get(), nbPlacePriseNew.get());
+                            parseEpreuve(root , Integer.parseInt(numEpr), newIntule, nbPlaceMaxNew, nbPlacePriseNew, newEtatEpreuve, "");
+                            listeConc.updateEpreuve(concoursId, numEpr, newEtatEpreuve.toString(), organisateur.toString(), date.toString(), 0, newIntule.toString(), nbPlaceMaxNew.get(), nbPlacePriseNew.get());
                             if (newEtatEpreuve.toString().compareTo(etat) != 0) {
                                 updateView = true;
                             }
                             if (newEtatEpreuve.toString().compareTo(DISPO) == 0) {
-                                listeConc.updateEpreuve(numConc, numEpr, newEtatEpreuve.toString(), organisateur.toString(), date.toString(), 1, newIntule.toString(), nbPlaceMaxNew.get(), nbPlacePriseNew.get());
+                                listeConc.updateEpreuve(concoursId, numEpr, newEtatEpreuve.toString(), organisateur.toString(), date.toString(), 1, newIntule.toString(), nbPlaceMaxNew.get(), nbPlacePriseNew.get());
                                 // notif
                                 Log.d("ConcoursReader", "Notif : ");
 
@@ -158,14 +213,14 @@ public class ConcoursReader {
 
 
                                  //SMS
-                                sendSMS("Place dispo " + numConc + " / " + numEpr + " : " + comment, context, smsList);
+                                sendSMS("Place dispo " + concoursId + " / " + numEpr + " : " + comment, context, smsList);
 
                             } else {
-                                listeConc.updateEpreuve(numConc, numEpr, newEtatEpreuve.toString(), organisateur.toString(), date.toString(), 0, newIntule.toString(), nbPlaceMaxNew.get(), nbPlacePriseNew.get());
+                                listeConc.updateEpreuve(concoursId, numEpr, newEtatEpreuve.toString(), organisateur.toString(), date.toString(), 0, newIntule.toString(), nbPlaceMaxNew.get(), nbPlacePriseNew.get());
                             }
 
                         } else {
-                            listeConc.updateEpreuve(numConc, numEpr, newEtat.toString(), organisateur.toString(), date.toString(), 0, UNKNOWN_STATE, 0, 0);
+                            listeConc.updateEpreuve(concoursId, numEpr, newEtat.toString(), organisateur.toString(), date.toString(), 0, UNKNOWN_STATE, 0, 0);
                         }
 
                     }
@@ -202,146 +257,155 @@ public class ConcoursReader {
         }
     }
 
-    private static void parseEpreuve(Document doc, int numEpr, StringBuilder newIntule, AtomicInteger nbPlaceMaxNew, AtomicInteger nbPlacePriseNew, StringBuilder newEtatEpreuve) {
-        Element table = doc.getElementById("table-contest-results");
-        if (table == null){
-            Log.d("ConcoursReader", "parseEpreuve : table not found");
-            return;
-        }
-        Elements tableBody = table.getElementsByTag("tbody");
-        if ((tableBody == null) || (tableBody.size()==0)){
-            Log.d("ConcoursReader", "parseEpreuve : tbody not found");
-            return;
-        }
-        Elements trs = tableBody.get(0).getElementsByTag("tr");
-        if ((trs == null) || (trs.size()==0)){
-            Log.d("ConcoursReader", "parseEpreuve : trs not found");
-            return;
-        }
-        for (Element tr : trs) {
-            Elements tds = tr.getElementsByTag("td");
-            if ((tds != null) || (trs.size()>=6)){
-                try {
-                    int tdNum = Integer.parseInt(tds.get(0).text());
-                    if (tdNum == numEpr){
-                        newIntule.append(tds.get(2).text());
-                        String[] tdEngage = tds.get(5).text().trim().split("/");
-                        if (tdEngage.length < 2){
-                            nbPlaceMaxNew.set(999);
-                            nbPlacePriseNew.set(Integer.parseInt(tdEngage[0].trim()));
-                            newEtatEpreuve.append(DISPO);
-                        }
-                        else{
-                            nbPlaceMaxNew.set(Integer.parseInt(tdEngage[1].trim()));
-                            nbPlacePriseNew.set(Integer.parseInt(tdEngage[0].trim()));
-                            if (nbPlacePriseNew.get() < nbPlaceMaxNew.get()){
-                                newEtatEpreuve.append(DISPO);
+    private static void parseEpreuve(JsonNode root, int numEpr, StringBuilder newIntule, AtomicInteger nbPlaceMaxNew, AtomicInteger nbPlacePriseNew, StringBuilder newEtatEpreuve, String numConcours) {
+
+
+        JsonNode liste = root.path("listeEprDis");
+        String numevt = root.path("numEvt2").textValue();
+
+        if (numConcours.isEmpty())
+        {
+            Log.d("ConcoursReader", "parseEpreuve : numConcours empty");
+            if (liste.isArray())
+            {
+                for (JsonNode item : liste) {
+                    String numconcoursItem = item.path("numconcours").textValue();
+                    String token = getToken();
+                    String urlStr = URL_BASE + "/index.php?ffeservice=TServiceEpreuvesConc"
+                            + "&site_provenance=ffe.com"
+                            + "&numEvt2=" + numevt
+                            + "&numconc=" + numconcoursItem;
+                    try {
+                        URL url = new URL(urlStr);
+                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                        conn.setRequestMethod("GET");
+                        conn.setRequestProperty("Authorization", "Bearer " + token);
+                        conn.setConnectTimeout(15000);
+                        conn.setReadTimeout(15000);
+                        int responseCode = conn.getResponseCode();
+
+                        BufferedReader reader;
+                        if (responseCode >= 200 && responseCode < 300) {
+                            reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                            StringBuilder response = new StringBuilder();
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                response.append(line);
                             }
-                            else{
-                                newEtatEpreuve.append(COMPLET);
+                            reader.close();
+
+                            String epreuves = response.toString();
+
+                            ObjectMapper mapper = new ObjectMapper();
+                            JsonNode rootepreuves = mapper.readTree(epreuves);
+                            JsonNode listeepreuves = rootepreuves.path("ListeEpreuveC");
+                            if (listeepreuves.isArray())
+                            {
+                                for (JsonNode itemEpreuve : listeepreuves) {
+                                    int epreuveNume = itemEpreuve.path("numEpreuve").asInt();
+                                    if (epreuveNume == numEpr){
+                                        newIntule.append(itemEpreuve.path("libelleEpreuve").textValue());
+                                        if (nbPlaceMaxNew.get() == 0 ) {
+                                            nbPlaceMaxNew.set(itemEpreuve.path("nbEngages").asInt());
+                                        }
+                                        nbPlacePriseNew.set(itemEpreuve.path("nbEngages").asInt());
+                                        if (nbPlacePriseNew.get()<nbPlaceMaxNew.get())
+                                            newEtatEpreuve.append(DISPO);
+                                        else
+                                            newEtatEpreuve.append(COMPLET);
+                                        return;
+                                    }
+                                }
                             }
                         }
-                        return;
+                        else {
+                            Log.d("ConcoursReader", "parseEpreuve responseCode : " + responseCode);
+                        }
+
+                        }
+                    catch (Exception e)
+                    {
+                        Log.d("ConcoursReader", "parseEpreuve exception : " + e.toString());
                     }
-                }
-                catch(NumberFormatException e){
+
 
                 }
             }
-
+            return;
         }
+
+        nbPlaceMaxNew.set(999);
+        nbPlacePriseNew.set(999);
+        newEtatEpreuve.append(DISPO);
         return;
 
 
     }
 
-    static private void getOrganisateurDate(Document doc, StringBuilder organisateur, StringBuilder date, String myurl) {
-        Elements organisateurElem = doc.getElementsByClass("bloc-ffec-body");
-        if (organisateurElem.size() == 0) {
-            organisateur.append(UNKNOWN_STATE);
-            date.append(UNKNOWN_DATE);
-            Log.w("ConcoursReader", myurl + " : orgnisateur non trouve");
-        } else {
 
-            Element orgaDate = organisateurElem.get(0).child(0);
-            if (orgaDate == null) {
-                organisateur.append(UNKNOWN_STATE);
-                date.append(UNKNOWN_DATE);
-                Log.w("ConcoursReader", myurl + " : orgnisateur non trouve");
-            }
-            String orgaDateString = orgaDate.ownText();
-            Log.d("ConcoursReader", myurl + " : " + orgaDateString);
-            // recherche organisateur
-            organisateur.append(orgaDateString.substring(13).split(" du")[0]);
-            int i = orgaDateString.indexOf(") du ") + 5;
-            date.append(orgaDateString.substring(i, i + 24));
-        }
-    }
-
-    static private Document DownloadUrl(String myurl, StringBuilder etat, StringBuilder organisateur, StringBuilder date) throws IOException {
+    static private JsonNode DownloadUrl(String concId, StringBuilder etat, StringBuilder organisateur, StringBuilder date) throws IOException {
         try {
 
-            Document doc = Jsoup.connect(myurl).get();
-            Elements etatElem = doc.getElementsByClass("d-block d-sm-none");
-            if (etatElem.size() == 0) {
+            Log.d("ConcoursReader", "DownloadUrl concours : " + concId);
+            String token = getToken();
+
+            String urlStr = URL_BASE + "/index.php?ffeservice=TServiceFicheConcours"
+                    + "&site_provenance=ffe.com"
+                    + "&numEvt2=" + concId;
+            URL url = new URL(urlStr);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Authorization", "Bearer " + token);
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(15000);
+
+            int responseCode = conn.getResponseCode();
+
+            BufferedReader reader;
+            if (responseCode >= 200 && responseCode < 300) {
+                reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                String fiche = response.toString();
+
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode root = mapper.readTree(fiche);
+
+                Log.d("ConcoursReader", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root));
+                List<String> numConcList = new ArrayList<>();
+                JsonNode liste = root.path("listeEprDis");
+                int nbEpreuvesTotal = 0;
+                if (liste.isArray())
+                {
+                    for (JsonNode item : liste) {
+                        nbEpreuvesTotal += item.path("nbEpreuves").asInt(0);
+                    }
+                }
+                if (nbEpreuvesTotal > 0)
+                    etat.append(OUVERT_STATE);
+                else
+                    etat.append(CALENDRIER_STATE);
+
+                organisateur.append(root.path("lieuLibelle"));
+                date.append(root.path("datedebut"));
+                return root;
+             } else {
+                Log.d("ConcoursReader", "DownloadUrl responseCode : " + responseCode);
                 etat.append(UNKNOWN_STATE);
                 organisateur.append(UNKNOWN_STATE);
                 date.append(UNKNOWN_DATE);
-                return doc;
+                return new ObjectMapper().createObjectNode();
             }
-            Log.d("ConcoursReader", "etatElem : " + etatElem.html());
 
-            switch (etatElem.html()) {
-                case "Ouvert aux engagements":
-                    Log.d("ConcoursReader", myurl + " : concours ouverts");
-                    etat.append(OUVERT_STATE);
-                    getOrganisateurDate(doc, organisateur, date, myurl);
-                    return doc;
-                case "En cours":
-                    Log.d("ConcoursReader", myurl + " : concours Encours");
-                    etat.append(EN_COURS_STATE);
-                    getOrganisateurDate(doc, organisateur, date, myurl);
-                    return doc;
-                case "Traité":
-                    Log.d("ConcoursReader", myurl + " : concours traité");
-                    etat.append(TERMINE_STATE);
-                    getOrganisateurDate(doc, organisateur, date, myurl);
-                    return doc;
-                case "Avant programme":
-                    Log.d("ConcoursReader", myurl + " : concours avant programme");
-                    etat.append(AVANT_PROGRAMME_STATE);
-                    getOrganisateurDate(doc, organisateur, date, myurl);
-                    return doc;
-                case "Calendrier":
-                    Log.d("ConcoursReader", myurl + " : concours au calendrier");
-                    etat.append(CALENDRIER_STATE);
-                    getOrganisateurDate(doc, organisateur, date, myurl);
-                    return doc;
-                case "Annulé":
-                    Log.d("ConcoursReader", myurl + " : concours annule");
-                    etat.append(ANNULE_STATE);
-                    getOrganisateurDate(doc, organisateur, date, myurl);
-                    return doc;
-                case "Clos aux engagements":
-                    Log.d("ConcoursReader", myurl + " : Clos aux engagements");
-                    etat.append(CLOS_STATE);
-                    getOrganisateurDate(doc, organisateur, date, myurl);
-                    return doc;
-                default:
-                    Log.d("ConcoursReader", myurl + " : concours ouverts");
-                    etat.append(UNKNOWN_STATE);
-                    organisateur.append(UNKNOWN_STATE);
-                    return doc;
-            }
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             Log.d("ConcoursReader", "exception :" + ex.toString());
             etat.append(UNKNOWN_STATE);
-            return null;
-        }
-        catch (Exception ex) {
-            Log.d("ConcoursReader", "exception :" + ex.toString());
-            etat.append(UNKNOWN_STATE);
-            return null;
+            return new ObjectMapper().createObjectNode();
         }
     }
 
